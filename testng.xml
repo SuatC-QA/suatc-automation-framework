@@ -1,0 +1,20 @@
+<suite name="SuatC Automation Test Suite" verbose="1">
+    <test name="UI Tests">
+        <packages>
+            <package name="com.suatc.qa.tests.ui"/>
+        </packages>
+    </test>
+
+    <test name="API Tests">
+        <packages>
+            <package name="com.suatc.qa.tests.api"/>
+        </packages>
+    </test>
+
+    <test name="BDD Cucumber Tests">
+        <classes>
+            <class name="com.suatc.qa.runners.CucumberTestRunner"/>
+        </classes>
+    </test>
+
+</suite>

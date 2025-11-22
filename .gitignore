@@ -1,0 +1,41 @@
+# -------------------- IDE Files --------------------
+# IntelliJ IDEA
+.idea/
+*.iws
+*.iml
+*.ipr
+out/
+
+# -------------------- Build Artifacts --------------------
+# Maven
+target/
+logs/
+dependency-reduced-pom.xml
+
+# -------------------- Java/OS/Temp --------------------
+# Compiled Java Class Files
+*.class
+# Log files
+*.log
+# macOS-specific files
+.DS_Store
+# Windows files
+Thumbs.db
+
+# -------------------- Framework Specifics --------------------
+# Test execution outputs (e.g., reports, screenshots)
+test-output/
+allure-results/
+allure-report/
+screenshots/
+drivers/
+release.properties
+
+# -------------------- Other IDEs  --------------------
+# Eclipse
+.classpath
+.project
+.settings/
+
+# VS Code
+.vscode/
