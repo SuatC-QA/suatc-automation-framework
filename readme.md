@@ -14,14 +14,14 @@ The goal of this project is to demonstrate production-style framework design sui
 
 - **Language:** Java 17
 - **UI Automation:** Selenium 4.27.0
-- **API Automation:** REST Assured 5.5.6, Jackson Databind 2.20.1
+- **API Automation:** REST Assured 5.5.6, Jackson Databind 2.20.1 *(dependencies added, API test module in progress)*
 - **Test Frameworks:** TestNG 7.10.2, Cucumber 7.20.1 (TestNG runner)
 - **Build Tool:** Maven
-- **Logging:** Log4j2 (console + rolling file logs under `target/logs`)
+- **Logging:** Log4j2 (configuration in place for console + rolling file logs under `target/logs`; logging usage will be expanded over time)
 - **Reporting:**
     - TestNG console output
-    - Cucumber HTML reports via `maven-cucumber-reporting` (for Cucumber suites)
-    - Allure integration planned
+    - Cucumber HTML reports via `maven-cucumber-reporting` *(planned)*
+    - Allure integration *(planned)*
 
 ---
 
@@ -40,10 +40,10 @@ This file defines browser, environment, timeouts, and test data. Example keys:
 - `browser.headless` - `true` / `false` to run in headless mode
 - `env` - current environment (e.g. `qa`, `prod`)
 - `url.qa`, `url.prod` - base URLs per environment
-- `timeout.implicit` - implicit wait (set to `0` when using explicit waits)
+- `timeout.implicit` - implicit wait in seconds (recommended `0` when relying on explicit waits)
 - `timeout.default` - default explicit wait timeout (seconds)
 - `timeout.page_load` - page load timeout (seconds)
-- `screenshot.on_failure` - `true` / `false` flag for screenshot behavior on test failure
+- `screenshot.on_failure` - planned flag for screenshot behavior on test failure
 - `user.*` / `pass.*` - public test credentials (e.g. SauceDemo users)
 
 > Note: Credentials in this file are **public test users only**. Real projects should load secrets via environment variables or CI/CD secret management.
@@ -78,21 +78,23 @@ mvn clean test
 
 ## 🏗 Project Layout
 
-_Current (initial) structure:_
+**Current structure (commit 2):**
 
-- `src/main/resources` - core framework configuration (`log4j2.xml`, `config.properties`)
-- `src/test/resources` - feature files (planned) and other test-only resources
-- `testng.xml` - main TestNG suite entry point
-- `pom.xml` - Maven project + dependencies
+- `src/main/java/com/suatc/qa/base` - Core base classes (`BasePage`)
+- `src/main/java/com/suatc/qa/config` - Configuration (`ConfigReader`)
+- `src/main/java/com/suatc/qa/factory` - Driver management (`DriverFactory`)
+- `src/main/java/com/suatc/qa/pages` - Page objects (`LoginPage`, `InventoryPage`)
+- `src/main/resources` - Framework configuration (`config.properties`, `log4j2.xml`)
+- `src/test/java/com/suatc/qa/base` - Test base classes (`BaseTest`)
+- `src/test/java/com/suatc/qa/hooks` - Cucumber hooks (`Hooks`)
+- `src/test/java/com/suatc/qa/tests` - UI TestNG tests (e.g. `LoginTest`)
+- `src/test/resources` - Test resources (e.g. feature files – planned)
+- `testng.xml` - TestNG suite entry point
+- `pom.xml` - Maven configuration and dependencies
 
-_Planned/expanding package structure (Core modules such as driver factory, utils, and base classes will be added as the framework grows)
+**Planned modules:**
 
-- `src/main/java/com/suatc/qa/base` - Base Setup
-- `src/main/java/com/suatc/qa/factory` - Driver Management
-- `src/main/java/com/suatc/qa/utils` - Utilities
-- `src/main/java/com/suatc/qa/config` - ConfigReader, environment helpers
-- `src/main/java/com/suatc/qa/pages` - Page Objects
-- `src/main/java/com/suatc/qa/api` - API clients
-- `src/test/java/com/suatc/qa/tests` - UI/API TestNG tests
+- `src/main/java/com/suatc/qa/utils` - Shared utilities
+- `src/main/java/com/suatc/qa/api` - API clients and request builders
 - `src/test/java/com/suatc/qa/stepdefinitions` - Cucumber step definitions
-- `src/test/java/com/suatc/qa/runners` - TestNG+Cucumber runners
+- `src/test/java/com/suatc/qa/runners` - Cucumber + TestNG runners
