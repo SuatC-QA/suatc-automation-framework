@@ -1,7 +1,8 @@
 package com.suatc.qa.factory;
 
 import com.suatc.qa.config.ConfigReader;
-
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
@@ -16,14 +17,15 @@ import java.time.Duration;
  */
 public final class DriverFactory {
 
+    private static final Logger logger = LogManager.getLogger(DriverFactory.class);
     private static final ThreadLocal<WebDriver> driver = new ThreadLocal<>();
 
     private DriverFactory() {
-        // Utility class
     }
 
     public static void initDriver() {
         if (driver.get() != null) {
+            logger.debug("WebDriver already initialized for current thread");
             return;
         }
 
@@ -38,6 +40,8 @@ public final class DriverFactory {
                 config.getPropertyOrDefault("browser.headless", "false")
         );
 
+        logger.info("Initializing WebDriver: browser={}, headless={}", browser, headless);
+
         WebDriver webDriver = switch (browser) {
             case "chrome" -> createChromeDriver(headless);
             case "firefox" -> createFirefoxDriver(headless);
@@ -47,6 +51,9 @@ public final class DriverFactory {
 
         long implicitTimeout = Long.parseLong(config.getProperty("timeout.implicit"));
         long pageLoadTimeout = Long.parseLong(config.getProperty("timeout.page_load"));
+
+        logger.debug("Configuring timeouts: implicit={}s, pageLoad={}s",
+                implicitTimeout, pageLoadTimeout);
 
         webDriver.manage()
                 .timeouts()
@@ -95,11 +102,14 @@ public final class DriverFactory {
     public static void quitDriver() {
         WebDriver webDriver = driver.get();
         if (webDriver != null) {
+            logger.info("Quitting WebDriver for current thread");
             try {
                 webDriver.quit();
             } finally {
                 driver.remove();
             }
+        } else {
+            logger.debug("No WebDriver to quit for current thread");
         }
     }
 }

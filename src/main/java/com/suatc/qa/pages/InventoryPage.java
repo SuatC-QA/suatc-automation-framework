@@ -1,7 +1,6 @@
 package com.suatc.qa.pages;
 
 import com.suatc.qa.base.BasePage;
-
 import org.openqa.selenium.By;
 
 public class InventoryPage extends BasePage {

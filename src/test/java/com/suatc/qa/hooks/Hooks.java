@@ -1,7 +1,6 @@
 package com.suatc.qa.hooks;
 
 import com.suatc.qa.factory.DriverFactory;
-
 import io.cucumber.java.After;
 import io.cucumber.java.Before;
 

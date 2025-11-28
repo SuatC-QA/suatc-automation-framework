@@ -23,10 +23,6 @@ public class ConfigReader {
         }
     }
 
-    private static class ConfigReaderHelper {
-        private static final ConfigReader INSTANCE = new ConfigReader();
-    }
-
     public static ConfigReader getInstance() {
         return ConfigReaderHelper.INSTANCE;
     }
@@ -39,12 +35,17 @@ public class ConfigReader {
             throw new RuntimeException("Property '" + key + "' not specified in the config.properties file.");
         }
     }
+
     public String getPropertyOrDefault(String key, String defaultValue) {
         String value = properties.getProperty(key);
         if (value == null || value.isBlank()) {
             return defaultValue;
         }
         return value;
+    }
+
+    private static class ConfigReaderHelper {
+        private static final ConfigReader INSTANCE = new ConfigReader();
     }
 
 }

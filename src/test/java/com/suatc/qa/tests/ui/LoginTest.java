@@ -4,7 +4,6 @@ import com.suatc.qa.base.BaseTest;
 import com.suatc.qa.config.ConfigReader;
 import com.suatc.qa.pages.InventoryPage;
 import com.suatc.qa.pages.LoginPage;
-
 import org.testng.annotations.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;

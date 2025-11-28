@@ -4,7 +4,8 @@
 
 A hybrid UI + API test automation framework designed for scalability and maintainability.
 
-Built with **Java 17**, **Selenium 4**, **TestNG**, and **Cucumber**, the framework follows the **Page Object Model (POM)** pattern to keep page structure and test logic cleanly separated.
+Built with **Java 17**, **Selenium 4**, **TestNG**, and **Cucumber**, the framework follows the **Page Object Model (
+POM)** pattern to keep page structure and test logic cleanly separated.
 
 The goal of this project is to demonstrate production-style framework design suitable for real-world SDET roles.
 
@@ -17,7 +18,8 @@ The goal of this project is to demonstrate production-style framework design sui
 - **API Automation:** REST Assured 5.5.6, Jackson Databind 2.20.1 *(dependencies added, API test module in progress)*
 - **Test Frameworks:** TestNG 7.10.2, Cucumber 7.20.1 (TestNG runner)
 - **Build Tool:** Maven
-- **Logging:** Log4j2 (configuration in place for console + rolling file logs under `target/logs`; logging usage will be expanded over time)
+- **Logging:** Log4j2 (configuration in place for console + rolling file logs under `target/logs`; logging usage will be
+  expanded over time)
 - **Reporting:**
     - TestNG console output
     - Cucumber HTML reports via `maven-cucumber-reporting` *(planned)*
@@ -46,7 +48,8 @@ This file defines browser, environment, timeouts, and test data. Example keys:
 - `screenshot.on_failure` - planned flag for screenshot behavior on test failure
 - `user.*` / `pass.*` - public test credentials (e.g. SauceDemo users)
 
-> Note: Credentials in this file are **public test users only**. Real projects should load secrets via environment variables or CI/CD secret management.
+> Note: Credentials in this file are **public test users only**. Real projects should load secrets via environment
+> variables or CI/CD secret management.
 
 ### `log4j2.xml`
 
@@ -78,7 +81,7 @@ mvn clean test
 
 ## 🏗 Project Layout
 
-**Current structure (commit 2):**
+**Current structure:**
 
 - `src/main/java/com/suatc/qa/base` - Core base classes (`BasePage`)
 - `src/main/java/com/suatc/qa/config` - Configuration (`ConfigReader`)

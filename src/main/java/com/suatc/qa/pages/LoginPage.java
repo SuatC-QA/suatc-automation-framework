@@ -1,7 +1,6 @@
 package com.suatc.qa.pages;
 
 import com.suatc.qa.base.BasePage;
-
 import org.openqa.selenium.By;
 
 public class LoginPage extends BasePage {
@@ -16,6 +15,7 @@ public class LoginPage extends BasePage {
     }
 
     public InventoryPage login(String username, String password) {
+        logger.info("Logging in with user {}", username);
         typeUsername(username);
         typePassword(password);
         clickLogin();
