@@ -47,8 +47,10 @@ This file defines browser, environment, timeouts, URLs, API auth, and UI test da
     - `browser` – e.g. `chrome`
     - `browser.headless` – `true` / `false` to run in headless mode
     - `page.load.strategy` – page load strategy for Selenium (`normal`, `eager`, `none`)
-        - Chrome defaults to `eager` to reduce flakiness from slow-loading assets
+        - Applied consistently to both Chrome and Firefox via `resolvePageLoadStrategy()`
+        - Defaults to `eager` to reduce flakiness from slow-loading assets
     - `env` – current environment (e.g. `qa`, `prod`)
+        - `BasePage` resolves the base UI URL from `url.{env}` (e.g. `env=qa` → `url.qa`)
 
 - **Application URLs**
     - `url.qa` – base UI URL for QA (SauceDemo)
@@ -60,7 +62,7 @@ This file defines browser, environment, timeouts, URLs, API auth, and UI test da
 
 - **Timeouts (seconds)**
     - `timeout.implicit` – implicit wait (set to `0` to avoid conflicts with explicit waits)
-    - `timeout.default` – default explicit wait timeout
+    - `timeout.default` – default explicit wait timeout for explicit waits in `BasePage`
     - `timeout.page_load` – page load timeout
 
 - **Reporting / Failure Handling**
@@ -95,6 +97,9 @@ mvn -Dpage.load.strategy=normal clean test
 
 # Combine overrides
 mvn -Dbrowser=firefox -Dbrowser.headless=true -Dpage.load.strategy=none clean test
+
+# Switch environment (BasePage will use url.prod when env=prod)
+mvn -Denv=prod clean test
 ```
 
 This makes the framework flexible for local runs, CI, and different environments without editing source files.
@@ -143,7 +148,7 @@ mvn -Dbrowser.headless=true clean test
 
 This matches the configuration used in the GitHub Actions CI workflow.
 
-### Run with a different browser or strategy
+### Run with a different browser, env, or strategy
 
 Examples:
 
@@ -153,6 +158,9 @@ mvn -Dbrowser=firefox clean test
 
 # Chrome, headless, with eager page load strategy
 mvn -Dbrowser=chrome -Dbrowser.headless=true -Dpage.load.strategy=eager clean test
+
+# Prod environment, headless Chrome
+mvn -Denv=prod -Dbrowser.headless=true clean test
 ```
 
 ---
@@ -193,6 +201,7 @@ logging and screenshots on failure.
 - `waitForVisible` / `waitForClickable` helpers
 - A custom `UiElementTimeoutException` to wrap Selenium `TimeoutException`
 - A retry-once navigation in `openBaseUrl()` to reduce sporadic headless navigation timeouts
+- Environment-aware base URL resolution from `env` and `url.{env}`
 
 ### API (REST Assured + TestNG)
 
@@ -231,7 +240,7 @@ Cucumber scenarios are executed via a TestNG-based `CucumberTestRunner`.
 **Current structure:**
 
 - `src/main/java/com/suatc/qa/base`
-    - Core base classes (e.g. `BasePage` – navigation, common waits, and timeout handling)
+    - Core base classes (e.g. `BasePage` – navigation, env-aware base URL resolution, common waits, and timeout handling)
 - `src/main/java/com/suatc/qa/config`
     - Configuration (`ConfigReader`)
 - `src/main/java/com/suatc/qa/factory`
