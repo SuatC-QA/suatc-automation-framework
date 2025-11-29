@@ -1,4 +1,5 @@
 # SUATC Automation Framework
+[![CI](https://github.com/SuatC-QA/suatc-automation-framework/actions/workflows/CI.yml/badge.svg)](https://github.com/SuatC-QA/suatc-automation-framework/actions/workflows/CI.yml)
 
 ## 🚀 Overview
 
@@ -45,6 +46,8 @@ This file defines browser, environment, timeouts, URLs, API auth, and UI test da
 - **Browser / Environment**
     - `browser` – e.g. `chrome`
     - `browser.headless` – `true` / `false` to run in headless mode
+    - `page.load.strategy` – page load strategy for Selenium (`normal`, `eager`, `none`)
+        - Chrome defaults to `eager` to reduce flakiness from slow-loading assets
     - `env` – current environment (e.g. `qa`, `prod`)
 
 - **Application URLs**
@@ -69,6 +72,32 @@ This file defines browser, environment, timeouts, URLs, API auth, and UI test da
 
 > Note: Credentials in this file are **public test users only**. Real projects should load secrets via environment
 > variables or CI/CD secret management.
+
+#### Overriding configuration via JVM system properties (`-D`)
+
+All configuration keys can be overridden at runtime via JVM system properties. Precedence:
+
+1. **System property** (`-Dkey=value`)
+2. `config.properties`
+3. Method-level default (where applicable)
+
+Examples:
+
+```bash
+# Run full suite with headless Chrome (overrides browser.headless=false from config.properties)
+mvn -Dbrowser.headless=true clean test
+
+# Switch to Firefox
+mvn -Dbrowser=firefox clean test
+
+# Customize page load strategy
+mvn -Dpage.load.strategy=normal clean test
+
+# Combine overrides
+mvn -Dbrowser=firefox -Dbrowser.headless=true -Dpage.load.strategy=none clean test
+```
+
+This makes the framework flexible for local runs, CI, and different environments without editing source files.
 
 ### `log4j2.xml`
 
@@ -104,6 +133,28 @@ This executes:
 - API tests (TestNG + REST Assured)
 - BDD tests (Cucumber feature(s) via TestNG runner)
 
+### Run in headless mode (CI-friendly)
+
+To run the full suite in headless mode (e.g. locally or in CI):
+
+```bash
+mvn -Dbrowser.headless=true clean test
+```
+
+This matches the configuration used in the GitHub Actions CI workflow.
+
+### Run with a different browser or strategy
+
+Examples:
+
+```bash
+# Firefox, headed
+mvn -Dbrowser=firefox clean test
+
+# Chrome, headless, with eager page load strategy
+mvn -Dbrowser=chrome -Dbrowser.headless=true -Dpage.load.strategy=eager clean test
+```
+
 ---
 
 ## 🧪 Test Coverage (Current)
@@ -121,6 +172,7 @@ This executes:
     - Page Objects:
         - `LoginPage` – login form interactions
         - `InventoryPage` – verification of the products page
+
 - **Checkout flow (SauceDemo)**
     - `CheckoutTest`:
         - Logs in as a standard user
@@ -135,6 +187,12 @@ This executes:
 
 UI tests extend `BaseTest`, which manages WebDriver lifecycle via `DriverFactory` and integrates with `TestListener` for
 logging and screenshots on failure.
+
+`BasePage` centralizes common Selenium interactions and explicit waits (`WebDriverWait`), including:
+
+- `waitForVisible` / `waitForClickable` helpers
+- A custom `UiElementTimeoutException` to wrap Selenium `TimeoutException`
+- A retry-once navigation in `openBaseUrl()` to reduce sporadic headless navigation timeouts
 
 ### API (REST Assured + TestNG)
 
@@ -173,7 +231,7 @@ Cucumber scenarios are executed via a TestNG-based `CucumberTestRunner`.
 **Current structure:**
 
 - `src/main/java/com/suatc/qa/base`
-    - Core base classes (e.g. `BasePage`)
+    - Core base classes (e.g. `BasePage` – navigation, common waits, and timeout handling)
 - `src/main/java/com/suatc/qa/config`
     - Configuration (`ConfigReader`)
 - `src/main/java/com/suatc/qa/factory`
@@ -201,10 +259,28 @@ Cucumber scenarios are executed via a TestNG-based `CucumberTestRunner`.
     - Cucumber + TestNG runners (e.g. `CucumberTestRunner`)
 - `src/test/resources/features`
     - Cucumber feature files (e.g. `login.feature`)
+- `.github/workflows/CI.yml`
+    - GitHub Actions workflow to run the Maven test suite in headless mode on push and pull requests
 - `testng.xml`
     - TestNG suite entry point (UI tests, API tests, and Cucumber runner)
 - `pom.xml`
     - Maven configuration and dependencies
+
+---
+
+## 🔁 Continuous Integration (GitHub Actions)
+
+The repository includes a GitHub Actions workflow (`.github/workflows/CI.yml`) that:
+
+- Runs on pushes to `main`/`master` and on pull requests
+- Sets up Java 17 and caches the Maven repository
+- Executes the full test suite in **headless Chrome** using:
+
+```bash
+mvn -Dbrowser.headless=true clean test
+```
+
+This ensures every change is validated in a clean, CI-like environment and demonstrates CI integration as part of the framework design.
 
 ---
 
