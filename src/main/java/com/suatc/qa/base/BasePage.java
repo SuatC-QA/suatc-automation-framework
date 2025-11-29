@@ -29,8 +29,8 @@ public abstract class BasePage {
     protected BasePage() {
         this.driver = DriverFactory.getDriver();
         this.config = ConfigReader.getInstance();
-        this.baseUrl = config.getProperty("url.qa");
-        if (baseUrl.isBlank()) {
+        String env = config.getProperty("env", "qa").toLowerCase().trim();
+        this.baseUrl = config.getProperty("url." + env);        if (baseUrl.isBlank()) {
             throw new IllegalStateException(
                     "Config property 'url.qa' must be non-blank"
             );
@@ -51,7 +51,13 @@ public abstract class BasePage {
 
     protected void openBaseUrl() {
         logger.info("Navigating to base URL: {}", baseUrl);
-        driver.get(baseUrl);
+
+        try {
+            driver.get(baseUrl);
+        } catch (TimeoutException e) {
+            logger.warn("Navigation to {} timed out once (likely headless flakiness). Retrying...", baseUrl, e);
+            driver.get(baseUrl);
+        }
     }
 
     protected void goTo(String path) {

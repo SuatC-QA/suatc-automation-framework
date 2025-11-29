@@ -28,20 +28,32 @@ public class ConfigReader {
     }
 
     public String getProperty(String key) {
-        String value = properties.getProperty(key);
-        if (value != null) {
-            return value;
-        } else {
-            throw new RuntimeException("Property '" + key + "' not specified in the config.properties file.");
+        String systemValue = System.getProperty(key);
+        if (systemValue != null && !systemValue.isBlank()) {
+            return systemValue.trim();
         }
+
+        String value = properties.getProperty(key);
+        if (value != null && !value.isBlank()) {
+            return value.trim();
+        }
+
+        throw new RuntimeException(
+                "Property '" + key + "' not specified in system properties or config.properties."
+        );
     }
 
-    public String getPropertyOrDefault(String key, String defaultValue) {
+    public String getProperty(String key, String defaultValue) {
+        String systemValue = System.getProperty(key);
+        if (systemValue != null && !systemValue.isBlank()) {
+            return systemValue.trim();
+        }
+
         String value = properties.getProperty(key);
         if (value == null || value.isBlank()) {
-            return defaultValue;
+            return defaultValue == null ? null : defaultValue.trim();
         }
-        return value;
+        return value.trim();
     }
 
     private static class ConfigReaderHelper {

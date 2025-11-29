@@ -16,7 +16,7 @@ public class TestListener implements ITestListener {
         ConfigReader config = ConfigReader.getInstance();
 
         boolean screenshotOnFailure = Boolean.parseBoolean(
-                config.getPropertyOrDefault("screenshot.on_failure", "true")
+                config.getProperty("screenshot.on_failure", "true")
         );
 
         if (!screenshotOnFailure) {

@@ -4,6 +4,7 @@ import com.suatc.qa.config.ConfigReader;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.openqa.selenium.Dimension;
+import org.openqa.selenium.PageLoadStrategy;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
@@ -21,6 +22,7 @@ public final class DriverFactory {
 
     private static final Logger logger = LogManager.getLogger(DriverFactory.class);
     private static final ThreadLocal<WebDriver> driver = new ThreadLocal<>();
+    private static final ConfigReader config = ConfigReader.getInstance();
 
     private DriverFactory() {
     }
@@ -31,15 +33,13 @@ public final class DriverFactory {
             return;
         }
 
-        ConfigReader config = ConfigReader.getInstance();
-
         String browser = config
-                .getPropertyOrDefault("browser", "chrome")
+                .getProperty("browser", "chrome")
                 .toLowerCase()
                 .trim();
 
         boolean headless = Boolean.parseBoolean(
-                config.getPropertyOrDefault("browser.headless", "false")
+                config.getProperty("browser.headless", "false")
         );
 
         logger.info("Initializing WebDriver: browser={}, headless={}", browser, headless);
@@ -80,10 +80,30 @@ public final class DriverFactory {
         prefs.put("profile.password_manager_leak_detection", false);
         options.setExperimentalOption("prefs", prefs);
         options.addArguments("--disable-features=PasswordLeakDetection");
+        String pls = config.getProperty("page.load.strategy", "eager").toLowerCase();
+
+        PageLoadStrategy strategy;
+        switch (pls) {
+            case "eager" -> strategy = PageLoadStrategy.EAGER;
+            case "none"  -> strategy = PageLoadStrategy.NONE;
+            default      -> {
+                logger.warn("Unknown page.load.strategy '{}', falling back to NORMAL", pls);
+                strategy = PageLoadStrategy.NORMAL;
+            }
+        }
+
+        options.setPageLoadStrategy(strategy);
+        logger.info("Using page load strategy: {}", strategy);
 
         if (headless) {
-            options.addArguments("--headless=new", "--disable-gpu");
+            logger.info("Creating ChromeDriver in headless mode");
+            options.addArguments("--headless=new", "--disable-gpu", "--window-size=1920,1080");
+        } else {
+            logger.info("Creating ChromeDriver in headed mode");
         }
+
+        options.addArguments("--no-sandbox");
+        options.addArguments("--disable-dev-shm-usage");
 
         return new ChromeDriver(options);
     }
