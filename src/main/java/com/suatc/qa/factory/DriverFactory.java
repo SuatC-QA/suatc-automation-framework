@@ -11,6 +11,8 @@ import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.firefox.FirefoxOptions;
 
 import java.time.Duration;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Centralized WebDriver management with ThreadLocal support for parallel execution.
@@ -71,6 +73,13 @@ public final class DriverFactory {
 
     private static WebDriver createChromeDriver(boolean headless) {
         ChromeOptions options = new ChromeOptions();
+
+        Map<String, Object> prefs = new HashMap<>();
+        prefs.put("credentials_enable_service", false);
+        prefs.put("profile.password_manager_enabled", false);
+        prefs.put("profile.password_manager_leak_detection", false);
+        options.setExperimentalOption("prefs", prefs);
+        options.addArguments("--disable-features=PasswordLeakDetection");
 
         if (headless) {
             options.addArguments("--headless=new", "--disable-gpu");
