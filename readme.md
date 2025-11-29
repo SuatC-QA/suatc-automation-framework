@@ -121,6 +121,17 @@ This executes:
     - Page Objects:
         - `LoginPage` – login form interactions
         - `InventoryPage` – verification of the products page
+- **Checkout flow (SauceDemo)**
+    - `CheckoutTest`:
+        - Logs in as a standard user
+        - Adds Sauce Labs Backpack to the cart
+        - Proceeds through the checkout information step to the overview page
+        - Asserts the selected item is present on the checkout overview page
+    - Page Objects:
+        - `InventoryPage` – adds product to cart and opens the cart
+        - `CartPage` – verifies cart contents and navigates to checkout
+        - `CheckoutInformationPage` – enters customer details and continues
+        - `CheckoutOverviewPage` – verifies item is present before order completion
 
 UI tests extend `BaseTest`, which manages WebDriver lifecycle via `DriverFactory` and integrates with `TestListener` for
 logging and screenshots on failure.
@@ -172,35 +183,26 @@ Cucumber scenarios are executed via a TestNG-based `CucumberTestRunner`.
 - `src/main/java/com/suatc/qa/listeners`
     - TestNG listeners (e.g. `TestListener` for screenshots, logging)
 - `src/main/java/com/suatc/qa/pages`
-    - UI Page Objects (`LoginPage`, `InventoryPage`)
-
+    - UI Page Objects (`LoginPage`, `InventoryPage`, `CartPage`, `CheckoutInformationPage`, `CheckoutOverviewPage`)
 - `src/main/resources`
     - Framework configuration (`config.properties`, `log4j2.xml`)
-
 - `src/test/java/com/suatc/qa/base`
     - Test base classes:
         - `BaseTest` – UI TestNG base (WebDriver lifecycle)
         - `BaseApiTest` – API TestNG base (REST Assured base URI + API key)
-
 - `src/test/java/com/suatc/qa/tests/ui`
-    - UI TestNG tests (e.g. `LoginTest`)
-
+    - UI TestNG tests (e.g. `LoginTest`, `CheckoutTest`)
 - `src/test/java/com/suatc/qa/tests/api`
     - API TestNG tests (e.g. `UserApiTest`)
-
 - `src/test/java/com/suatc/qa/stepdefinitions`
     - Cucumber step definitions (`LoginSteps`)
     - Cucumber hooks (`Hooks` – WebDriver setup/teardown)
-
 - `src/test/java/com/suatc/qa/runners`
     - Cucumber + TestNG runners (e.g. `CucumberTestRunner`)
-
 - `src/test/resources/features`
     - Cucumber feature files (e.g. `login.feature`)
-
 - `testng.xml`
     - TestNG suite entry point (UI tests, API tests, and Cucumber runner)
-
 - `pom.xml`
     - Maven configuration and dependencies
 
@@ -208,7 +210,7 @@ Cucumber scenarios are executed via a TestNG-based `CucumberTestRunner`.
 
 ## 📌 Planned Enhancements
 
-- Additional UI flows (e.g. add-to-cart, checkout)
+- Additional UI flows (e.g. remove-from-cart, sorting/filtering, full order completion)
 - More API test coverage and reusable API client utilities
 - Cucumber HTML report generation via `maven-cucumber-reporting`
 - Allure integration for combined UI/API/BDD reporting
