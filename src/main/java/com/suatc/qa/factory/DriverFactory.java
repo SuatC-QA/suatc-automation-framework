@@ -80,20 +80,10 @@ public final class DriverFactory {
         prefs.put("profile.password_manager_leak_detection", false);
         options.setExperimentalOption("prefs", prefs);
         options.addArguments("--disable-features=PasswordLeakDetection");
-        String pls = config.getProperty("page.load.strategy", "eager").toLowerCase();
 
-        PageLoadStrategy strategy;
-        switch (pls) {
-            case "eager" -> strategy = PageLoadStrategy.EAGER;
-            case "none"  -> strategy = PageLoadStrategy.NONE;
-            default      -> {
-                logger.warn("Unknown page.load.strategy '{}', falling back to NORMAL", pls);
-                strategy = PageLoadStrategy.NORMAL;
-            }
-        }
-
+        PageLoadStrategy strategy = resolvePageLoadStrategy();
         options.setPageLoadStrategy(strategy);
-        logger.info("Using page load strategy: {}", strategy);
+        logger.info("Using Chrome page load strategy: {}", strategy);
 
         if (headless) {
             logger.info("Creating ChromeDriver in headless mode");
@@ -111,11 +101,31 @@ public final class DriverFactory {
     private static WebDriver createFirefoxDriver(boolean headless) {
         FirefoxOptions options = new FirefoxOptions();
 
-        if (headless) {
-            options.addArguments("-headless");
-        }
+        PageLoadStrategy strategy = resolvePageLoadStrategy();
+        options.setPageLoadStrategy(strategy);
+        logger.info("Using Firefox page load strategy: {}", strategy);
 
+        if (headless) {
+            logger.info("Creating FirefoxDriver in headless mode");
+            options.addArguments("-headless");
+        } else {
+            logger.info("Creating FirefoxDriver in headed mode");
+        }
         return new FirefoxDriver(options);
+    }
+
+    private static PageLoadStrategy resolvePageLoadStrategy() {
+        String pls = config.getProperty("page.load.strategy", "eager").toLowerCase();
+
+        return switch (pls) {
+            case "eager" -> PageLoadStrategy.EAGER;
+            case "none"  -> PageLoadStrategy.NONE;
+            case "normal" -> PageLoadStrategy.NORMAL;
+            default -> {
+                logger.warn("Unknown page.load.strategy '{}', falling back to NORMAL", pls);
+                yield PageLoadStrategy.NORMAL;
+            }
+        };
     }
 
     public static WebDriver getDriver() {

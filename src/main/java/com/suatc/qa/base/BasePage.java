@@ -29,10 +29,16 @@ public abstract class BasePage {
     protected BasePage() {
         this.driver = DriverFactory.getDriver();
         this.config = ConfigReader.getInstance();
-        String env = config.getProperty("env", "qa").toLowerCase().trim();
-        this.baseUrl = config.getProperty("url." + env);        if (baseUrl.isBlank()) {
+
+        String env = config.getProperty("env", "qa")
+                .toLowerCase()
+                .trim();
+
+        this.baseUrl = config.getProperty("url." + env);
+
+        if (baseUrl == null || baseUrl.isBlank()) {
             throw new IllegalStateException(
-                    "Config property 'url.qa' must be non-blank"
+                    "Config property 'url." + env + "' must be non-blank for env=" + env
             );
         }
 
